@@ -15,7 +15,7 @@ class PostController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'images'    => 'nullable|array',
             'images.*'    => 'nullable|image'
         ]);
@@ -28,7 +28,7 @@ class PostController extends Controller
             $post = Post::create([
                 'user_id' => $userId,
                 'title' => $validated['title'],
-                'content' => $validated['content'],
+                'content' => $validated['content'] ?? '',
             ]);
 
 

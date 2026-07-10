@@ -50,15 +50,14 @@
                     <p v-if="statusMessage">{{ statusMessage }}</p>
                 </div>
             </form>
-            <div v-if="message">
-                <h3>{{ message }}</h3>
+            <div v-if="createdPost">
+                <h3>{{ createdPost }}</h3>
                 <div v-if="createdPost.images && createdPost.images.length">
                     <img
                         v-for="img in createdPost.images"
                         :key="img.id"
                         :src="'/storage/' + img.path"
                         alt="Изображение к посту"
-                        class="post-img"
                     />
                 </div>
             </div>
@@ -143,7 +142,7 @@ const removeImage = (id) => {
 
     if (index !== -1) {
         URL.revokeObjectURL(imageFiles.value[index].preview);
-        imageFiles.value.slice(index, 1);
+        imageFiles.value.splice(index, 1);
     }
 };
 
@@ -171,7 +170,7 @@ const submitForm  = async () => {
 
         statusMessage.value = 'Данные успешно отправлены!';
 
-        isUploading.value = false;
+
 
         createdPost.value = response.data;
 

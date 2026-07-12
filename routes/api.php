@@ -9,7 +9,8 @@ Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/personal', [\App\Http\Controllers\ProfileController::class, 'show']);
-    Route::post('/post', [\App\Http\Controllers\PostController::class, 'store']);
+    Route::get('/posts', [\App\Http\Controllers\PostController::class, 'index']);
+    Route::post('/posts', [\App\Http\Controllers\PostController::class, 'store']);
     Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
 });
 

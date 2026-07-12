@@ -50,22 +50,31 @@
                     <p v-if="statusMessage">{{ statusMessage }}</p>
                 </div>
             </form>
-            <div v-if="createdPost">
-                <h3>{{ createdPost }}</h3>
-                <div v-if="createdPost.images && createdPost.images.length">
-                    <img
-                        v-for="img in createdPost.images"
-                        :key="img.id"
-                        :src="'/storage/' + img.path"
-                        alt="Изображение к посту"
-                    />
+<!--            <div v-if="createdPost">-->
+<!--                <h3>{{ createdPost }}</h3>-->
+<!--                <div v-if="createdPost.images && createdPost.images.length">-->
+<!--                    <img-->
+<!--                        v-for="img in createdPost.images"-->
+<!--                        :key="img.id"-->
+<!--                        :src="'/storage/' + img.path"-->
+<!--                        alt="Изображение к посту"-->
+<!--                    />-->
+<!--                </div>-->
+<!--            </div>-->
+
+        </div>
+
+        <div v-if="posts">
+            <div v-for="post in posts">
+                <h1>{{ post.title }}</h1>
+                <div>
+                    <img :src="post.images" alt="Изображение">
                 </div>
+                <p>{{ post.content}}</p>
             </div>
-        </div>
-
-        <div>
 
         </div>
+
     </div>
 </template>
 
@@ -86,7 +95,7 @@ const message = ref('');
 const user = ref(null);
 const createdPost = ref(null);
 
-
+const posts = ref([]);
 const getUserData = async () => {
     try {
         const response = await axios.get('/api/personal');
@@ -98,8 +107,13 @@ const getUserData = async () => {
 
 onMounted(() => {
     getUserData();
+    getPosts();
 });
 
+const getPosts = async() => {
+    const response = await axios.get('/api/posts');
+    posts.value = response.data.data
+}
 
 const canSubmit = computed(() => {
     return title.value.trim() && (content.value.trim() || imageFiles.value.length > 0);
@@ -162,7 +176,7 @@ const submitForm  = async () => {
         isUploading.value = true;
         statusMessage.value = 'Отправка данных на Laravel...';
 
-        const response = await axios.post('/api/post', formDataPost, {
+        const response = await axios.post('/api/posts', formDataPost, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }

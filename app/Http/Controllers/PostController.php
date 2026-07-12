@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PostResource;
 use App\Models\Post;
 use App\Models\PostImage;
 use Illuminate\Http\Request;
@@ -11,6 +12,11 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
+    public function index()
+    {
+        $posts = Post::where('user_id', auth()->id())->latest()->get();
+        return PostResource::collection($posts);
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -55,7 +61,7 @@ class PostController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Не удалось создать пост с картинками.',
-                'error' => $e->getMessage() // Уберите эту строку в продакшене из соображений безопасности
+                'error' => $e->getMessage()
             ], 500);
         }
 

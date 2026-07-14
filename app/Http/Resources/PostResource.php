@@ -19,7 +19,7 @@ class PostResource extends JsonResource
             'title' => $this->title,
             'content' => $this->content,
 
-            'created_at' => $this->created_at->toIso8601String(),
+            'created_at' => $this->created_at->diffForHumans(),
 
             'images' => ImageResource::collection($this->whenLoaded('images')),
         ];

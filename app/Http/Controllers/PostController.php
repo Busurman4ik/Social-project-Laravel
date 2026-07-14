@@ -4,17 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PostResource;
 use App\Models\Post;
-use App\Models\PostImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::where('user_id', auth()->id())->latest()->get();
+        $posts = Post::with('images')->where('user_id', auth()->id())->latest()->get();
         return PostResource::collection($posts);
     }
     public function store(Request $request)
@@ -52,7 +50,7 @@ class PostController extends Controller
 
             DB::commit();
 
-            return response()->json($post);
+            return new PostResource($post);
 
 
         } catch (\Exception $e) {

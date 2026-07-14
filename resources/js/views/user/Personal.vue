@@ -9,10 +9,10 @@
                     <h1 class="mb-3 w-full text-[17px]">Post</h1>
                 </div>
                 <div>
-                    <input v-model.trim="title" class="rounded-3xl border-1 border-gray-600 w-full p-2 mb-5" type="text" placeholder="title">
+                    <input v-model.trim="title" class="rounded-3xl border-1 border-gray-600 w-full px-3 py-2 mb-5" type="text" placeholder="title">
                 </div>
                 <div>
-                    <textarea v-model.trim="content" class="rounded-3xl border-1 border-gray-600 w-full p-2 mb-7" placeholder="content"></textarea>
+                    <textarea v-model.trim="content" class="rounded-3xl border-1 border-gray-600 w-full px-3 py-2 mb-7" placeholder="content"></textarea>
                 </div>
                 <div class="flex mb-7">
                     <div>
@@ -24,7 +24,7 @@
 
                         <div v-if="imageFiles.length" >
                             <div class="grid grid-cols-3 gap-4 w-full mb-9">
-                                <div v-for="(item, index) in imageFiles" :key="item.id" class="aspect-[4/3] w-full relative">
+                                <div v-for="(item, index) in imageFiles" :key="item?.id || index" class="aspect-[4/3] w-full relative">
                                     <div class="">
                                         <button type="button" @click="removeImage(item.id)" class="w-8 h-8 bg-gray-400 hover:bg-gray-500 text-white rounded-full text-center cursor-pointer absolute -top-3 -right-3 font-bold">×</button>
                                     </div>
@@ -50,27 +50,17 @@
                     <p v-if="statusMessage">{{ statusMessage }}</p>
                 </div>
             </form>
-<!--            <div v-if="createdPost">-->
-<!--                <h3>{{ createdPost }}</h3>-->
-<!--                <div v-if="createdPost.images && createdPost.images.length">-->
-<!--                    <img-->
-<!--                        v-for="img in createdPost.images"-->
-<!--                        :key="img.id"-->
-<!--                        :src="'/storage/' + img.path"-->
-<!--                        alt="Изображение к посту"-->
-<!--                    />-->
-<!--                </div>-->
-<!--            </div>-->
 
         </div>
 
-        <div v-if="posts">
-            <div v-for="post in posts">
-                <h1>{{ post.title }}</h1>
-                <div>
-                    <img :src="post.images" alt="Изображение">
+        <div v-if="posts && posts.length">
+            <div v-for="post in posts" :key="post?.id" class="mb-7 pb-7 border-b border-gray-300">
+                <h1 class="text-xl font-bold mb-2">{{ post?.title }}</h1>
+                <div v-if="post?.images && post.images.length" class="flex flex-wrap gap-2 mb-3">
+                    <img v-for="(img, imgIndex) in post.images" :src="img?.url" :key="img?.id || imgIndex" alt="Изображение">
                 </div>
-                <p>{{ post.content}}</p>
+                <p class="mb-4 text-gray-700 whitespace-pre-line">{{ post?.content}}</p>
+                <p class="text-slate-500 text-sm text-right">{{ post?.created_at}}</p>
             </div>
 
         </div>
@@ -91,9 +81,7 @@ const fileInput = ref(null);
 const isUploading = ref(false);
 const statusMessage = ref('');
 
-const message = ref('');
 const user = ref(null);
-const createdPost = ref(null);
 
 const posts = ref([]);
 const getUserData = async () => {
@@ -101,7 +89,7 @@ const getUserData = async () => {
         const response = await axios.get('/api/personal');
         user.value = response.data;
     } catch (error) {
-        user.value = null; // Если 401 ошибка, значит пользователь не авторизован
+        user.value = null;
     }
 };
 
@@ -116,7 +104,7 @@ const getPosts = async() => {
 }
 
 const canSubmit = computed(() => {
-    return title.value.trim() && (content.value.trim() || imageFiles.value.length > 0);
+    return title.value && title.value.trim() && (content.value.trim() || imageFiles.value.length > 0);
 });
 
 const handleFileSelect = (event) => {
@@ -184,14 +172,13 @@ const submitForm  = async () => {
 
         statusMessage.value = 'Данные успешно отправлены!';
 
+        const newPost = response.data.data;
+        posts.value.unshift(newPost);
 
-
-        createdPost.value = response.data;
-
-        message.value = response.data;
 
         title.value = '';
         content.value = '';
+
         removeImagesAll();
 
 

@@ -2,10 +2,10 @@
     <div class="w-96 mx-auto">
         <form  @submit.prevent="handleLogin" >
             <div>
-                <input v-model="form.email" type="email" placeholder="email" class="w-96 p-1 mb-2 border border-inherit rounded-lg">
+                <input v-model="form.email" type="email" placeholder="email" autocomplete="username" class="w-96 p-1 mb-2 border border-inherit rounded-lg">
             </div>
             <div>
-                <input v-model="form.password" type="password" placeholder="password" class="w-96 p-1 mb-2 border border-inherit rounded-lg">
+                <input v-model="form.password" type="password" placeholder="password" autocomplete="current-password" class="w-96 p-1 mb-2 border border-inherit rounded-lg">
             </div>
             <div >
                 <button  type="submit" value="login" class="block  mx-auto w-full p-1 bg-sky-400 text-white rounded-lg cursor-pointer">Login</button>
@@ -47,7 +47,6 @@ const handleLogin = async () => {
 
         localStorage.setItem('user_token', response.data.token);
 
-        // Перенаправляем пользователя после успешного входа
         await router.push({name: 'user.personal'});
     } catch (e) {
         if (e.response && e.response.status === 422) {

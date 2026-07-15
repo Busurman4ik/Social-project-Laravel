@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Resources\ProfileResource;
 
 class ProfileController extends Controller
 {
-    public function show(Request $request)
+    public function show()
     {
-        return response()->json($request->user());
+        return new ProfileResource(auth()->user());
     }
 }

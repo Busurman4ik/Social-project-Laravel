@@ -5,7 +5,10 @@
             <RouterLink v-if="!token" to="/user/login" class="mr-10">Login</RouterLink>
             <RouterLink v-if="!token"  to="/user/registration" >Registration</RouterLink>
             <RouterLink v-if="token" to="/user/personal" class="mr-3 float-left">Personal</RouterLink>
-            <a v-if="token" href="#" @click.prevent="handleLogout" class="float-right">Logout</a>
+            <div class="float-right flex">
+                <p v-if="user" class="mr-4 text-sm text-slate-500">{{ user.name }}</p>
+                <a v-if="token" href="#" @click.prevent="handleLogout" class="">Logout</a>
+            </div>
         </nav>
         <main class="p-6 max-w-[700px] mx-auto">
             <RouterView />
@@ -20,7 +23,7 @@ import axios from "./axios.js";
 
 const router = useRouter();
 const route = useRoute();
-
+const user = ref(null);
 const token = ref(null);
 
 
@@ -28,44 +31,54 @@ const getToken = () => {
     token.value = localStorage.getItem('user_token')
 }
 
+const getUserData = async () => {
+    if (!token.value) {
+        user.value = null;
+        return;
+    }
+
+    try {
+        const response = await axios.get('/api/personal');
+        user.value = response.data.data || response.data;
+    } catch (error) {
+        if (error.response?.status === 401) {
+            handleLocalLogout();
+        }
+    }
+};
+
 onMounted(() => {
     getToken();
+    getUserData();
 });
 
 watch(
     () => route.path,
     () => {
-        getToken()
+        getToken();
+        getUserData();
     },
     { immediate: true } // immediate: true выполнит проверку ОДИН раз сразу при загрузке сайта [1]
 )
 
 const handleLocalLogout = () => {
     localStorage.removeItem('user_token');
+    token.value = null;
+    user.value = null;
 };
 
 
 const handleLogout = async () => {
     try {
         await axios.post('/api/logout');
-
-        handleLocalLogout();
-
-        await router.push({name: 'user.login'});
-
     } catch (error) {
+        console.error('Ошибка при выходе на сервере', error);
+    } finally {
         handleLocalLogout();
-        console.error('Ошибка при выходе', error);
+        await router.push({name: 'user.login'});
     }
 };
 
-
-
-if (!token) {
-    router.push({name: 'user.login'});
-} else {
-    router.push({name: 'user.personal'});
-}
 
 
 </script>

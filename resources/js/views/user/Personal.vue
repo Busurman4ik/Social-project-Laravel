@@ -1,9 +1,6 @@
 <template>
     <div  class="p-6 w-130 mx-auto">
         <div v-if="user">
-            <h1 class="mb-10 w-full text-[18px] text-center">Hello, {{ user.name }}</h1>
-        </div>
-        <div v-if="user">
             <form @submit.prevent="submitForm" class="mb-13">
                 <div>
                     <h1 class="mb-3 w-full text-[17px]">Post</h1>
@@ -70,7 +67,7 @@
 
 <script setup>
 import axios from "../../axios.js";
-import {ref, onMounted, computed} from 'vue';
+import {ref, onMounted, onUnmounted, computed} from 'vue';
 
 const title = ref('');
 const content = ref('');
@@ -84,10 +81,53 @@ const statusMessage = ref('');
 const user = ref(null);
 
 const posts = ref([]);
+const page = ref(1);
+const hasMorePages = ref(true);
+const isBufferLoading = ref(false);
+
+// Функция загрузки постов порциями
+const getPosts = async () => {
+    if (!hasMorePages.value || isBufferLoading.value) return;
+
+    try {
+        isBufferLoading.value = true;
+
+        const response = await axios.get(`/api/posts?page=${page.value}`);
+        const newPosts = response.data.data;
+
+        if (newPosts.length > 0) {
+            posts.value.push(...newPosts);
+            page.value++;
+        }
+
+
+        if (response.data.meta && response.data.meta.current_page === response.data.meta.last_page) {
+            hasMorePages.value = false;
+        }
+
+        if (newPosts.length < 5) {
+            hasMorePages.value = false;
+        }
+
+    } catch (error) {
+        console.error('Ошибка при загрузке постов:', error);
+    } finally {
+        isBufferLoading.value = false;
+    }
+};
+
+const handleScroll = () => {
+    const element = document.documentElement;
+
+    if (element.scrollHeight - element.scrollTop <= element.clientHeight + 100) {
+        getPosts();
+    }
+};
+
 const getUserData = async () => {
     try {
         const response = await axios.get('/api/personal');
-        user.value = response.data;
+        user.value = response.data.data;
     } catch (error) {
         user.value = null;
     }
@@ -96,12 +136,13 @@ const getUserData = async () => {
 onMounted(() => {
     getUserData();
     getPosts();
+    window.addEventListener('scroll', handleScroll);
 });
 
-const getPosts = async() => {
-    const response = await axios.get('/api/posts');
-    posts.value = response.data.data
-}
+onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll);
+});
+
 
 const canSubmit = computed(() => {
     return title.value && title.value.trim() && (content.value.trim() || imageFiles.value.length > 0);

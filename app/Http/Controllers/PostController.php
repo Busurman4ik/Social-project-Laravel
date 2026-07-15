@@ -12,7 +12,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('images')->where('user_id', auth()->id())->latest()->get();
+        $posts = Post::with('images')->where('user_id', auth()->id())->latest()->paginate(5);
         return PostResource::collection($posts);
     }
     public function store(Request $request)

@@ -1,18 +1,18 @@
-import { createMemoryHistory, createRouter } from 'vue-router'
+import { createRouter, createWebHistory} from 'vue-router'
 
 import Login from '../views/user/Login.vue'
 import Personal from '../views/user/Personal.vue'
 import Registration from '../views/user/Registration.vue'
-import axios from "axios";
 
 const routes = [
+    { path: '/', redirect: '/user/personal' },
     { path: '/user/login', component: Login, name: 'user.login'},
     { path: '/user/personal', component: Personal, name: 'user.personal'},
     { path: '/user/registration', component: Registration, name: 'user.registration'}
 ]
 
 const router = createRouter({
-    history: createMemoryHistory(),
+    history: createWebHistory(),
     routes,
 })
 
@@ -22,20 +22,20 @@ router.beforeEach((to, from, next) => {
     if (!token) {
         if (to.name === 'user.login' || to.name === 'user.registration') {
             return next();
-        } else {
+        }
+        return next({ name: 'user.login' });
+    }
+
+    if (token) {
+
+        if(to.name === 'user.login' || to.name === 'user.registration') {
             return next({
-                name: 'user.login'
+                name: 'user.personal'
             });
         }
     }
 
-    if (token && to.name === 'user.login' || to.name === 'user.registration') {
-        return next({
-            name: 'user.personal'
-        });
-    }
-
-    next()
+    next();
 })
 
 

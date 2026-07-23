@@ -1,18 +1,22 @@
 <template>
 
-     <div class="max-w-[700px] mx-auto">
-        <nav class="p-6  text-center">
-            <RouterLink v-if="!token" to="/user/login" class="mr-10">Login</RouterLink>
-            <RouterLink v-if="!token"  to="/user/registration" >Registration</RouterLink>
-            <RouterLink v-if="token" to="/user/personal" class="mr-3 float-left">Personal</RouterLink>
-            <div class="float-right flex">
-                <p v-if="user" class="mr-4 text-sm text-slate-500">{{ user.name }}</p>
-                <a v-if="token" href="#" @click.prevent="handleLogout" class="">Logout</a>
-            </div>
-        </nav>
+     <div class="min-h-screen bg-slate-50 text-slate-800">
+         <div class="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-md border-b border-slate-200/50 shadow-sm transition-all duration-300">
+             <nav class="max-w-[700px] mx-auto px-6 py-4 flex items-center justify-between">
+                 <RouterLink v-if="!token" to="/user/login" class="mr-10">Login</RouterLink>
+                 <RouterLink v-if="!token"  to="/user/registration" >Registration</RouterLink>
+                 <RouterLink v-if="token" to="/user/personal" class="mr-3 float-left">Personal</RouterLink>
+                 <div class="float-right flex">
+                     <p v-if="user" class="mr-4 text-sm text-slate-500">{{ user.name }}</p>
+                     <a v-if="token" href="#" @click.prevent="handleLogout" class="">Logout</a>
+                 </div>
+             </nav>
+         </div>
+
         <main class="p-6 max-w-[700px] mx-auto">
             <RouterView />
         </main>
+
      </div>
 </template>
 

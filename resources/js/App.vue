@@ -5,7 +5,10 @@
              <nav class="max-w-[700px] mx-auto px-6 py-4 flex items-center justify-between">
                  <RouterLink v-if="!token" to="/user/login" class="mr-10">Login</RouterLink>
                  <RouterLink v-if="!token"  to="/user/registration" >Registration</RouterLink>
-                 <RouterLink v-if="token" to="/user/personal" class="mr-3 float-left">Personal</RouterLink>
+                 <div>
+                     <RouterLink v-if="token" to="/user/personal" class="mr-5 float-left">Personal</RouterLink>
+                     <RouterLink v-if="token" to="/user/users" class="mr-3 float-left">Users</RouterLink>
+                 </div>
                  <div class="float-right flex">
                      <p v-if="user" class="mr-4 text-sm text-slate-500">{{ user.name }}</p>
                      <a v-if="token" href="#" @click.prevent="handleLogout" class="">Logout</a>

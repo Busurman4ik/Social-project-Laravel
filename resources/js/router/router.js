@@ -3,11 +3,13 @@ import { createRouter, createWebHistory} from 'vue-router'
 import Login from '../views/user/Login.vue'
 import Personal from '../views/user/Personal.vue'
 import Registration from '../views/user/Registration.vue'
+import Index from "../views/user/Index.vue";
 
 const routes = [
     { path: '/', redirect: '/user/personal' },
     { path: '/user/login', component: Login, name: 'user.login'},
     { path: '/user/personal', component: Personal, name: 'user.personal'},
+    { path: '/user/users', component: Index, name: 'user.users'},
     { path: '/user/registration', component: Registration, name: 'user.registration'}
 ]
 
